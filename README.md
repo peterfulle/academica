@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Academica
 
-## Getting Started
+Plataforma de gestión académica para colegios en Chile — Next.js + TypeScript + Drizzle/Postgres con Row-Level Security multi-tenant, desplegada en Render.
 
-First, run the development server:
+## Desarrollo local
+
+Requiere Postgres corriendo localmente (ver `.env.example` para las variables de conexión: `DATABASE_URL`/`APP_DATABASE_URL` para dev, `TEST_DATABASE_URL`/`TEST_APP_DATABASE_URL` para tests).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run db:push       # aplica el schema de Drizzle
+npm run dev           # http://localhost:3000
+npm test              # suite de tests, incluye aislamiento de tenants (RLS)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Arquitectura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **App:** Next.js (App Router) + TypeScript + Tailwind + shadcn/ui, desplegada como web service en Render.
+- **Datos:** PostgreSQL (Render) + Drizzle ORM. Multi-tenant vía `colegio_id` + Row-Level Security — ver `src/server/db/rls-policies.sql`.
+- **Tests:** `tests/tenant-isolation.test.ts` es la suite de regresión que prueba que RLS realmente aísla los datos entre colegios.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ver el plan de fases y decisiones de arquitectura en el historial de planificación del proyecto.

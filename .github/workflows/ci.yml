@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: academi_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/academi_test
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/academi_test
+      APP_DATABASE_URL: postgres://academi_app:academi_app_ci@localhost:5432/academi_test
+      TEST_APP_DATABASE_URL: postgres://academi_app:academi_app_ci@localhost:5432/academi_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Push Drizzle schema
+        run: npx drizzle-kit push --force
+
+      - name: Create restricted app role and apply RLS policies
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d academi_test -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            if not exists (select from pg_roles where rolname = 'academi_app') then
+              create role academi_app login password 'academi_app_ci';
+            end if;
+          end
+          $$;
+          grant usage on schema public to academi_app;
+          grant select, insert, update, delete on all tables in schema public to academi_app;
+          alter default privileges in schema public grant select, insert, update, delete on tables to academi_app;
+          SQL
+          PGPASSWORD=postgres psql -h localhost -U postgres -d academi_test -v ON_ERROR_STOP=1 -f src/server/db/rls-policies.sql
+
+      - run: npx tsc --noEmit
+      - run: npx eslint .
+      - run: npx vitest run
