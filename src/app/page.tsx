@@ -1,18 +1,8 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-// Previews de los 4 dashboards por rol — solo para desarrollo local mientras
-// no existe autenticación real (Fase 0 aún no conecta Supabase Auth).
-const ROL_PREVIEWS = [
-  { href: "/admin", label: "Administrador" },
-  { href: "/profesor", label: "Profesor" },
-  { href: "/apoderado", label: "Apoderado" },
-  { href: "/alumno", label: "Alumno" },
-];
 
 export default function Home() {
   return (
@@ -27,7 +17,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Ingresar</CardTitle>
             <CardDescription>
-              Login con RUT y contraseña — pendiente de conectar a Supabase Auth.
+              Login con RUT y contraseña — pendiente de conectar la autenticación.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -49,15 +39,13 @@ export default function Home() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Vista previa (Fase 0, dev)</CardTitle>
-            <CardDescription>Sin sesión real todavía — accede directo al shell de cada rol.</CardDescription>
+            <CardTitle className="text-base">Sesión de desarrollo</CardTitle>
+            <CardDescription>Mientras no hay login real, entra eligiendo colegio y usuario.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {ROL_PREVIEWS.map((rol) => (
-              <Button key={rol.href} render={<Link href={rol.href} />} variant="secondary" size="sm">
-                {rol.label} <Badge variant="outline">preview</Badge>
-              </Button>
-            ))}
+          <CardContent>
+            <Button render={<Link href="/sesion" />} nativeButton={false} variant="secondary" className="w-full">
+              Entrar a sesión de desarrollo
+            </Button>
           </CardContent>
         </Card>
       </div>

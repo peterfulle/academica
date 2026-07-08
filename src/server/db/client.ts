@@ -25,7 +25,7 @@ export const db = drizzle(queryClient, { schema });
  * so every RLS policy scoped to that setting applies for the duration of `fn`.
  * This is the only way application code should read/write tenant data.
  */
-type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export async function withTenant<T>(colegioId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
   return db.transaction(async (tx) => {
