@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import type { Tx } from "@/server/db/client";
-import { alumno, apoderado, apoderadoAlumno, curso, matricula, persona, usuario } from "@/server/db/schema";
+import { alumno, apoderado, apoderadoAlumno, curso, matricula, usuario } from "@/server/db/schema";
+import { upsertPersona } from "./persona";
 
 type TipoRelacion = "madre" | "padre" | "tutor" | "otro";
 
@@ -102,32 +103,6 @@ async function upsertApoderado(
   const [created] = await tx
     .insert(apoderado)
     .values({ colegioId, personaId: personaRow.id, usuarioId: usuarioRow.id })
-    .returning();
-  return created;
-}
-
-async function upsertPersona(
-  tx: Tx,
-  colegioId: string,
-  input: { rut: string; nombres: string; apellidos: string; fechaNacimiento?: string }
-) {
-  const [existing] = await tx
-    .select()
-    .from(persona)
-    .where(and(eq(persona.colegioId, colegioId), eq(persona.rut, input.rut)));
-  if (existing) {
-    return existing;
-  }
-
-  const [created] = await tx
-    .insert(persona)
-    .values({
-      colegioId,
-      rut: input.rut,
-      nombres: input.nombres,
-      apellidos: input.apellidos,
-      fechaNacimiento: input.fechaNacimiento,
-    })
     .returning();
   return created;
 }

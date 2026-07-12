@@ -28,7 +28,11 @@ begin
     'curso',
     'alumno',
     'apoderado_alumno',
-    'matricula'
+    'matricula',
+    'asignatura',
+    'asignatura_curso',
+    'bloque_horario',
+    'horario_clase'
   ]
   loop
     policy_name := t || '_tenant_isolation';

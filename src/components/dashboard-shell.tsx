@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { NAV_BY_ROL, ROL_LABEL, type Rol } from "@/lib/nav";
@@ -20,19 +21,29 @@ export function DashboardShell({
         </div>
         <Separator className="mb-4" />
         <nav className="flex flex-col gap-1">
-          {items.map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-foreground/80"
-            >
-              <span>{item.label}</span>
-              {item.fase > 0 && (
-                <Badge variant="secondary" className="text-xs">
-                  Fase {item.fase}
-                </Badge>
-              )}
-            </div>
-          ))}
+          {items.map((item) => {
+            const content = (
+              <>
+                <span>{item.label}</span>
+                {item.fase > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    Fase {item.fase}
+                  </Badge>
+                )}
+              </>
+            );
+            const className = "flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-foreground/80";
+
+            return item.href ? (
+              <Link key={item.label} href={item.href} className={`${className} hover:bg-muted`}>
+                {content}
+              </Link>
+            ) : (
+              <div key={item.label} className={className}>
+                {content}
+              </div>
+            );
+          })}
         </nav>
       </aside>
       <main className="flex-1 p-8">{children}</main>

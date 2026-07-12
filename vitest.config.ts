@@ -13,5 +13,9 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // Tenant-isolation suites share one real Postgres database and each does
+    // its own delete-then-seed in beforeAll — running test files in parallel
+    // lets one file's cleanup wipe another's in-progress fixtures.
+    fileParallelism: false,
   },
 });
