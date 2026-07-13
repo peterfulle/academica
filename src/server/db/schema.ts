@@ -32,7 +32,7 @@ export const colegio = pgTable("colegio", {
  * flag, not FORCE or the policies themselves.
  */
 
-/** Identity + role binding for a tenant member. Source of truth for rol/colegio_id, not just Supabase auth.users. */
+/** Identity + role binding for a tenant member — the source of truth for rol/colegio_id once real auth exists. */
 export const usuario = pgTable("usuario", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   colegioId: uuid("colegio_id")
